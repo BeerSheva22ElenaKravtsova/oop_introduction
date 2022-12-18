@@ -19,9 +19,11 @@ public class Canvas extends Shape {
 	public void setDirection(String direction) {
 		switch (direction) {
 		case "row":
-			this.direction = "row";
+			this.direction = direction;
+			break;
 		case "column":
-			this.direction = "column";
+			this.direction = direction;
+			break;
 		default:
 			break;
 		}
@@ -45,16 +47,19 @@ public class Canvas extends Shape {
 		}
 		return shapes;
 	}
-	
+
 	@Override
 	public String[] presentation(int offset) {
 		setEqualSizeForPrinting(shapes);
 		String[] res = shapes[0].presentation(offset);
 		for (int j = 1; j < shapes.length; j++) {
+			if (shapes[j] instanceof Canvas) {
+				((Canvas) shapes[j]).setDirection(direction);
+			}
 			if (direction == "row") {
 				shapeAdditionForRow(res, shapes[j].presentation(margin));
 			} else {
-				res = new String[getHigthOfColumnArray()];
+				res = new String[getHeight()];
 				shapeAdditionForColumn(res, shapes[j].presentation(margin), offset);
 			}
 		}
@@ -81,12 +86,17 @@ public class Canvas extends Shape {
 		return res;
 	}
 
-	private int getHigthOfColumnArray() {
-		int heightOfColumn = shapes[0].getHeight();
+	@Override
+	public int getHeight() {
+		return direction == "row"? height : getHeightOfColumn();
+	}
+
+	public int getHeightOfColumn() {
+		int totalHeightOfColumn = shapes[0].getHeight();
 		for (int i = 1; i < shapes.length; i++) {
-			heightOfColumn += margin + shapes[i].getHeight();
+			totalHeightOfColumn += margin + shapes[i].getHeight();
 		}
-		return heightOfColumn;
+		return totalHeightOfColumn;
 	}
 
 	public String[] getMarginForColumn() {

@@ -58,14 +58,18 @@ class ShapeTests {
 	
 	@Test
 	void canvasTest() {
-		Shape rectangle = new Rectangle(5, 7);
-		Shape square = new Square(9);
-		Shape squareLeftTriangle = new SquareLeftTriangle(5);
-		Shape squareRightTriangle = new SquareRightTriangle(7);
-		Shape [] shapes = new Shape[] {rectangle, square, squareLeftTriangle, squareRightTriangle};
+		Shape [] shapes = new Shape[] {new Rectangle(5, 7), new Square(9), new SquareLeftTriangle(5), new SquareRightTriangle(7)};
 		Canvas canvas = new Canvas(15, 15, shapes);
-		displayStrings(canvas.presentation(10));
+		canvas.setMargin(1);
+//		displayStrings(canvas.presentation(10));
+//		canvas.setDirection("column");
+//		displayStrings(canvas.presentation(10));
+		
+		Canvas canvas1 = new Canvas(10, 10, new Shape[]{new SquareRightTriangle(7), canvas});
+		displayStrings(canvas1.presentation(10));
 		canvas.setDirection("column");
-		displayStrings(canvas.presentation(10));
+		canvas1.setDirection("column");
+		displayStrings(canvas1.presentation(10));
+		
 	}
 }
