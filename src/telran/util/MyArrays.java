@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 
-import telran.util.test.SortComparator;
-
 public class MyArrays {
 
 	public static <T> void sort(T[] objects, Comparator<T> comparator) {
@@ -44,7 +42,7 @@ public class MyArrays {
 			}
 			middle = left + (right - left) / 2;
 		}
-		return left > right ? -(left+1) : middle;
+		return left > right ? -(left + 1) : middle;
 	}
 
 	public static <T> T[] filter(T[] array, Predicate<T> predicate) {
@@ -68,8 +66,44 @@ public class MyArrays {
 		}
 		return res;
 	}
-	
 
-	
-	
+	/**
+	 * @param <T>
+	 * @param array
+	 * @param predicate
+	 * @return new array without the elements matching a given predicate
+	 */
+	public static <T> T[] removeIf(T[] array, Predicate<T> predicate) {
+		return filter(array, predicate.negate());
+	}
+
+	/**
+	 * @param <T>
+	 * @param array
+	 * @param predicate
+	 * @return Write public static <T> T[] removeRepeated(T[] array) 2.1.Returns new
+	 *         array without repeated elements with keeping the initial order
+	 *         Complexity O[N^2]
+	 */
+	public static <T> T[] removeRepeated(T[] array) {
+		T[] res = Arrays.copyOf(array, array.length);
+		Arrays.fill(res, null);
+		int i = 0;
+		while (array.length > 0) {
+			res[i] = array[0];
+			i++;
+			array = removeIf(array, t -> contains(res, t));
+		}
+		return Arrays.copyOf(res, i);
+	}
+
+	public static <T> boolean contains(T[] array, T pattern) {
+		boolean res = false;
+		int i = 0;
+		while (res != true && i < array.length) {
+			res = array[i] == null ? pattern == null : array[i].equals(pattern);
+			i++;
+		}
+		return res;
+	}
 }
