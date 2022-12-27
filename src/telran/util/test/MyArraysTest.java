@@ -2,6 +2,7 @@ package telran.util.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Disabled;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import telran.util.MyArrays;
 
 class MyArraysTest {
+	private static final int N_NUMBERS = 10_000;
+	private static final int N_RUNS = 1_000;
 	Integer numbers[] = { 13, 2, -8, 47, 100, 10, -7, 7 };
 	String strings[] = { "ab", "abm", "abmb", "abmbc" };
 
@@ -99,5 +102,30 @@ class MyArraysTest {
 		assertFalse(MyArrays.contains(numbers, 0));
 		assertFalse(MyArrays.contains(strings, ""));
 
+	}
+
+	@Test
+	void joinFunctionalTest() {
+		String expected = "13,2,-8,47,100,10,-7,7";
+		assertEquals(expected, MyArrays.join(numbers, ","), expected);
+
+	}
+
+	@Test
+	void joinPerformanceTest() {
+		Integer largeArray[] = getLargeNumbersArray();
+		for (int i = 0; i < N_RUNS; i++) {
+			MyArrays.join(largeArray, ", ");
+		}
+
+		String expected = "13,2,-8,47,100,10,-7,7";
+		assertEquals(expected, MyArrays.joinString(numbers, ","), expected);
+
+	}
+
+	private Integer[] getLargeNumbersArray() {
+		Integer[] res = new Integer[N_NUMBERS];
+		Arrays.fill(res, 1000);
+		return res;
 	}
 }

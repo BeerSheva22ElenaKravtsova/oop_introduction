@@ -106,4 +106,27 @@ public class MyArrays {
 		}
 		return res;
 	}
+
+	public static <T> String join(T[] array, String delimiter) {
+		String res = "";
+		if (array.length > 0) {
+			StringBuilder builder = new StringBuilder(array[0].toString());
+			for (int i = 1; i < array.length; i++) {
+				builder.append(delimiter).append(array[i]);
+			}
+			res = builder.toString();
+		}
+		return res;
+	}
+
+	public static <T> String joinString(T[] array, String delimiter) {
+		String res = "";
+		if (array.length > 0) {
+			res = array[0].toString();
+			for (int i = 1; i < array.length; i++) {
+				res += delimiter + array[i];
+			}
+		}
+		return res;
+	}
 }
