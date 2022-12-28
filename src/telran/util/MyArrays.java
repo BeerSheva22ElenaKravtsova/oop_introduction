@@ -46,15 +46,14 @@ public class MyArrays {
 	}
 
 	public static <T> T[] filter(T[] array, Predicate<T> predicate) {
-		int countPredicate = getCountPredicate(array, predicate);
-		T[] res = Arrays.copyOf(array, countPredicate);
+		T[] res = Arrays.copyOf(array, array.length);
 		int index = 0;
 		for (T element : array) {
 			if (predicate.test(element)) {
 				res[index++] = element;
 			}
 		}
-		return res;
+		return Arrays.copyOf(res, index);
 	}
 
 	private static <T> int getCountPredicate(T[] array, Predicate<T> predicate) {
