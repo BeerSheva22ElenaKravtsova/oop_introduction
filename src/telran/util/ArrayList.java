@@ -8,7 +8,23 @@ public class ArrayList<T> implements List<T> {
 	private static final int DEFAULT_CAPACITY = 16;
 	private T[] array;
 	private int size;
+	
+	private class ArrayListIterator implements Iterator<T>{
 
+		@Override
+		public boolean hasNext() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public T next() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	public ArrayList(int capacity) {
 		array = (T[]) new Object[capacity];
 	}
@@ -39,6 +55,7 @@ public class ArrayList<T> implements List<T> {
 				System.arraycopy(array, i + 1, array, i, size - i);
 				res = true;
 				size--;
+				array[size] = null;
 			}
 			i++;
 		}
@@ -47,18 +64,18 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public boolean removeIf(Predicate<T> predicate) {
-		boolean res = false;
+		//FIXME
+		//write implementation of O[N]. Hint working with only indexes.
+		int previousSize = size;
 		int i = 0;
 		while (i < size) {
 			if (predicate.test(array[i])) {
-				System.arraycopy(array, i + 1, array, i, size - i);
-				res = true;
-				size--;
+				remove(array[i]);
 			} else {
 				i++;
 			}
 		}
-		return res;
+		return previousSize > size;
 	}
 
 	@Override
@@ -95,12 +112,7 @@ public class ArrayList<T> implements List<T> {
 		if (arr.length < size) {
 			arr = Arrays.copyOf(arr, size);
 		}
-
-		if (arr.length > size) {
-			for (int j = size; j < arr.length; j++) {
-				arr[j] = null;
-			}
-		}
+		Arrays.fill(arr, size, arr.length, null);
 		System.arraycopy(array, 0, arr, 0, size);
 		return arr;
 	}
@@ -121,10 +133,7 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public T remove(int index) {
-		if (index < 0 || index >= size) {
-			throw new IndexOutOfBoundsException(
-					"You tried to call index: " + index + ", But size of array is: " + size);
-		}
+		throwIndexOutOfBoundsException(index);
 		T res = array[index];
 		System.arraycopy(array, index + 1, array, index, size - index);
 		size--;
@@ -155,19 +164,25 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public T get(int index) {
-		if (index < 0 || index >= size) {
-			throw new IndexOutOfBoundsException(
-					"You tried to call index: " + index + ", But size of array is: " + size);
-		}
+		throwIndexOutOfBoundsException(index);
 		return array[index];
 	}
 
 	@Override
 	public void set(int index, T element) {
+		throwIndexOutOfBoundsException(index);
+		array[index] = element;
+	}
+
+	private void throwIndexOutOfBoundsException(int index) {
 		if (index < 0 || index >= size) {
 			throw new IndexOutOfBoundsException(
 					"You tried to call index: " + index + ", But size of array is: " + size);
 		}
-		array[index] = element;
+	}
+
+	@Override
+	public Iterator iterator() {
+		return new ArrayListIterator();
 	}
 }
