@@ -1,26 +1,27 @@
 package telran.util;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
 public class ArrayList<T> implements List<T> {
-	private static final int DEFAULT_CAPACITY = 16;
+	static final int DEFAULT_CAPACITY = 16;
 	private T[] array;
 	private int size;
-	
-	private class ArrayListIterator implements Iterator<T>{
+
+	private class ArrayListIterator implements Iterator<T> {
+		int index = 0;
 
 		@Override
 		public boolean hasNext() {
-			// TODO Auto-generated method stub
-			return false;
+			return index < size;
 		}
 
 		@Override
 		public T next() {
-			// TODO Auto-generated method stub
-			return null;
+			return array[index++];
 		}
 	}
 
@@ -49,32 +50,26 @@ public class ArrayList<T> implements List<T> {
 	@Override
 	public boolean remove(T pattern) {
 		boolean res = false;
-		int i = 0;
-		while (res != true && i < size) {
-			if (pattern.equals(array[i])) {
-				System.arraycopy(array, i + 1, array, i, size - i);
-				res = true;
-				size--;
-				array[size] = null;
-			}
-			i++;
+		int i = indexOf(pattern);
+		if (i >= 0) {
+			remove(i);
+			res = true;
+			array[size] = null;
 		}
 		return res;
 	}
 
 	@Override
 	public boolean removeIf(Predicate<T> predicate) {
-		//FIXME
-		//write implementation of O[N]. Hint working with only indexes.
 		int previousSize = size;
-		int i = 0;
-		while (i < size) {
-			if (predicate.test(array[i])) {
-				remove(array[i]);
-			} else {
-				i++;
+		int indexCounter = 0;
+		for (int i = 0; i < size; i++) {
+			if (!predicate.test(array[i])) {
+				array[indexCounter++] = array[i];
 			}
 		}
+		size = indexCounter;
+		Arrays.fill(array, previousSize - size, previousSize, null);
 		return previousSize > size;
 	}
 
@@ -119,10 +114,7 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public void add(int index, T element) {
-		if (index < 0 || index > size) {
-			throw new IndexOutOfBoundsException(
-					"You tried to call index: " + index + ", But size of array is: " + size);
-		}
+		checkIndexException(index, 0, size);
 		if (size == array.length) {
 			reallocate();
 		}
@@ -133,7 +125,7 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public T remove(int index) {
-		throwIndexOutOfBoundsException(index);
+		checkIndexException(index, 0, size - 1);
 		T res = array[index];
 		System.arraycopy(array, index + 1, array, index, size - index);
 		size--;
@@ -145,7 +137,9 @@ public class ArrayList<T> implements List<T> {
 		int res = -1;
 		int i = 0;
 		while (res == -1 && i < array.length) {
-			res = (array[i] == null && pattern == null) || array[i].equals(pattern) ? i : -1;
+			if (isEquals(pattern, i)) {
+				res = i;
+			}
 			i++;
 		}
 		return res;
@@ -156,33 +150,39 @@ public class ArrayList<T> implements List<T> {
 		int res = -1;
 		int i = size - 1;
 		while (res == -1 && i >= 0) {
-			res = (array[i] == null && pattern == null) || array[i].equals(pattern) ? i : -1;
+			if (isEquals(pattern, i)) {
+				res = i;
+			}
 			i--;
 		}
 		return res;
 	}
 
+	private boolean isEquals(T pattern, int index) {
+		return array[index] == null ? array[index] == pattern : array[index].equals(pattern);
+	}
+
 	@Override
 	public T get(int index) {
-		throwIndexOutOfBoundsException(index);
+		checkIndexException(index, 0, size - 1);
 		return array[index];
 	}
 
 	@Override
 	public void set(int index, T element) {
-		throwIndexOutOfBoundsException(index);
+		checkIndexException(index, 0, size - 1);
 		array[index] = element;
 	}
 
-	private void throwIndexOutOfBoundsException(int index) {
-		if (index < 0 || index >= size) {
+	private void checkIndexException(int index, int from, int to) {
+		if (index < from || index > to) {
 			throw new IndexOutOfBoundsException(
 					"You tried to call index: " + index + ", But size of array is: " + size);
 		}
 	}
 
 	@Override
-	public Iterator iterator() {
+	public Iterator<T> iterator() {
 		return new ArrayListIterator();
 	}
 }
