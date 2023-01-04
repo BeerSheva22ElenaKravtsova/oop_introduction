@@ -1,9 +1,8 @@
 package telran.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public class ArrayList<T> implements List<T> {
@@ -21,6 +20,9 @@ public class ArrayList<T> implements List<T> {
 
 		@Override
 		public T next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
 			return array[index++];
 		}
 	}
@@ -63,7 +65,7 @@ public class ArrayList<T> implements List<T> {
 	public boolean removeIf(Predicate<T> predicate) {
 		int previousSize = size;
 		int indexCounter = 0;
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < previousSize; i++) {
 			if (!predicate.test(array[i])) {
 				array[indexCounter++] = array[i];
 			}
@@ -71,11 +73,6 @@ public class ArrayList<T> implements List<T> {
 		size = indexCounter;
 		Arrays.fill(array, previousSize - size, previousSize, null);
 		return previousSize > size;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return size == 0;
 	}
 
 	@Override
@@ -114,7 +111,7 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public void add(int index, T element) {
-		checkIndexException(index, 0, size);
+		checkIndex(index, 0, size);
 		if (size == array.length) {
 			reallocate();
 		}
@@ -125,7 +122,7 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public T remove(int index) {
-		checkIndexException(index, 0, size - 1);
+		checkIndex(index, 0, size - 1);
 		T res = array[index];
 		System.arraycopy(array, index + 1, array, index, size - index);
 		size--;
@@ -164,21 +161,14 @@ public class ArrayList<T> implements List<T> {
 
 	@Override
 	public T get(int index) {
-		checkIndexException(index, 0, size - 1);
+		checkIndex(index, 0, size - 1);
 		return array[index];
 	}
 
 	@Override
 	public void set(int index, T element) {
-		checkIndexException(index, 0, size - 1);
+		checkIndex(index, 0, size - 1);
 		array[index] = element;
-	}
-
-	private void checkIndexException(int index, int from, int to) {
-		if (index < from || index > to) {
-			throw new IndexOutOfBoundsException(
-					"You tried to call index: " + index + ", But size of array is: " + size);
-		}
 	}
 
 	@Override

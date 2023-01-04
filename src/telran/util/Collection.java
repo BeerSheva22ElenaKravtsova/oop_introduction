@@ -3,14 +3,16 @@ package telran.util;
 import java.util.function.*;
 
 public interface Collection<T> extends Iterable<T> {
-	
+
 	boolean add(T element);
 
 	boolean remove(T pattern);
 
 	boolean removeIf(Predicate<T> predicate);
 
-	boolean isEmpty();
+	default boolean isEmpty() {
+		return size() == 0;
+	}
 
 	int size();
 
