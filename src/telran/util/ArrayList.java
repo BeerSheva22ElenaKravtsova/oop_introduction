@@ -5,17 +5,18 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
-public class ArrayList<T> implements List<T> {
+public class ArrayList<T> extends AbstractCollection<T> implements List<T> {
 	static final int DEFAULT_CAPACITY = 16;
 	private T[] array;
-	private int size;
 
 	private class ArrayListIterator implements Iterator<T> {
-		int index = 0;
+		int current = 0;
+		boolean ableToRemove = false;
+		int previous = -1;
 
 		@Override
 		public boolean hasNext() {
-			return index < size;
+			return current < size;
 		}
 
 		@Override
@@ -23,7 +24,19 @@ public class ArrayList<T> implements List<T> {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			return array[index++];
+			ableToRemove = true;
+			previous++;
+			return array[current++];
+		}
+
+		@Override
+		public void remove() {
+			if (!ableToRemove) {
+				throw new IllegalStateException();
+			}
+			ArrayList.this.remove(previous);
+			previous--;
+			ableToRemove = false;
 		}
 	}
 
@@ -50,18 +63,6 @@ public class ArrayList<T> implements List<T> {
 	}
 
 	@Override
-	public boolean remove(T pattern) {
-		boolean res = false;
-		int i = indexOf(pattern);
-		if (i >= 0) {
-			remove(i);
-			res = true;
-			array[size] = null;
-		}
-		return res;
-	}
-
-	@Override
 	public boolean removeIf(Predicate<T> predicate) {
 		int previousSize = size;
 		int indexCounter = 0;
@@ -73,40 +74,6 @@ public class ArrayList<T> implements List<T> {
 		size = indexCounter;
 		Arrays.fill(array, previousSize - size, previousSize, null);
 		return previousSize > size;
-	}
-
-	@Override
-	public int size() {
-		return size;
-	}
-
-	@Override
-	public boolean contains(T pattern) {
-		boolean res = false;
-		int i = 0;
-		while (res != true && i < array.length) {
-			res = array[i] == null ? pattern == null : array[i].equals(pattern);
-			i++;
-		}
-		return res;
-	}
-
-	/**
-	 * @param arr
-	 * @return array containing elements of a collection if arr refers to memory
-	 *         that enough for all elements of collection than new array is not
-	 *         created otherwise there will be created new array if arr refers to
-	 *         memory that is greater the required for all elements of Collection
-	 *         will be put in the array and rest of memory will be filled by null's
-	 */
-	@Override
-	public T[] toArray(T[] arr) {
-		if (arr.length < size) {
-			arr = Arrays.copyOf(arr, size);
-		}
-		Arrays.fill(arr, size, arr.length, null);
-		System.arraycopy(array, 0, arr, 0, size);
-		return arr;
 	}
 
 	@Override
@@ -125,6 +92,7 @@ public class ArrayList<T> implements List<T> {
 		checkIndex(index, 0, size - 1);
 		T res = array[index];
 		System.arraycopy(array, index + 1, array, index, size - index);
+		array[size] = null;
 		size--;
 		return res;
 	}
@@ -134,7 +102,7 @@ public class ArrayList<T> implements List<T> {
 		int res = -1;
 		int i = 0;
 		while (res == -1 && i < array.length) {
-			if (isEquals(pattern, i)) {
+			if (isEqual(pattern, array[i])) {
 				res = i;
 			}
 			i++;
@@ -147,16 +115,12 @@ public class ArrayList<T> implements List<T> {
 		int res = -1;
 		int i = size - 1;
 		while (res == -1 && i >= 0) {
-			if (isEquals(pattern, i)) {
+			if (isEqual(pattern, array[i])) {
 				res = i;
 			}
 			i--;
 		}
 		return res;
-	}
-
-	private boolean isEquals(T pattern, int index) {
-		return array[index] == null ? array[index] == pattern : array[index].equals(pattern);
 	}
 
 	@Override

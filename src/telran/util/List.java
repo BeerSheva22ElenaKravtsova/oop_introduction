@@ -14,13 +14,22 @@ public interface List<T> extends Collection<T> {
 	void set(int index, T element);
 
 	default void checkIndex(int index, int from, int to) {
-	if (index < from || index > to) {
-		throw new IndexOutOfBoundsException(
-				"You tried to call index: " + index + ", But size of array is less");
+		if (index < from || index > to) {
+			throw new IndexOutOfBoundsException("You tried to call index: " + index + ", But size of array is less");
+		}
 	}
-}
 
 	@Override
+	default public boolean remove(T pattern) {
+		boolean res = false;
+		int i = indexOf(pattern);
+		if (i >= 0) {
+			remove(i);
+			res = true;
+		}
+		return res;
+	}
+
 	default boolean contains(T pattern) {
 		return indexOf(pattern) > -1;
 	}

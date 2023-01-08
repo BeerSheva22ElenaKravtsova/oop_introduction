@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +49,6 @@ public abstract class CollectionTest {
 		assertFalse(collection.removeIf(n -> n % 2 == 0));
 		assertTrue(collection.removeIf(n -> true));
 		assertTrue(collection.isEmpty());
-
 	}
 
 	@Test
@@ -70,7 +71,6 @@ public abstract class CollectionTest {
 
 	@Test
 	void testToArray() {
-
 		Arrays.fill(ar, 10);
 		assertTrue(ar == collection.toArray(ar));
 		for (int i = 0; i < numbers.length; i++) {
@@ -79,7 +79,23 @@ public abstract class CollectionTest {
 		for (int i = numbers.length; i < ar.length; i++) {
 			assertNull(ar[i]);
 		}
-
 	}
 
+	@Test
+	void removeIteratorTest() {
+		final Iterator<Integer> it = collection.iterator();
+		assertThrowsExactly(IllegalStateException.class, () -> it.remove());
+		Integer num = it.next();
+		assertTrue(collection.contains(num));
+		it.remove();
+		assertFalse(collection.contains(num));
+		assertThrowsExactly(IllegalStateException.class, () -> it.remove());
+		Iterator<Integer> it1 = collection.iterator();
+		while (it1.hasNext()) {
+			num = it1.next();
+		}
+		assertTrue(collection.contains(num));
+		it1.remove();
+		assertFalse(collection.contains(num));
+	}
 }
