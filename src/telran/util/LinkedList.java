@@ -152,11 +152,11 @@ public class LinkedList<T> extends AbstractCollection<T> implements List<T> {
 	 * No using property/method “size”
 	 * No using field prev in the class Node
 	 */
-	public boolean isLoop() {
+	public boolean hasLoop() {
 		boolean res = false;
 		Node<T> node = head;
-		Node<T> nextNode = head.next;
-		while (node != null && nextNode != null && !res) {
+		Node<T> nextNode = head;
+		while (nextNode != null && nextNode.next != null && !res) {
 			node = node.next;
 			nextNode = nextNode.next.next;
 			if (node == nextNode) {

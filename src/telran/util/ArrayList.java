@@ -34,8 +34,7 @@ public class ArrayList<T> extends AbstractCollection<T> implements List<T> {
 			if (!ableToRemove) {
 				throw new IllegalStateException();
 			}
-			ArrayList.this.remove(previous);
-			previous--;
+			ArrayList.this.remove(--previous);
 			ableToRemove = false;
 		}
 	}
